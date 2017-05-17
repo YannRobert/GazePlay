@@ -32,7 +32,7 @@ public class Bubbles extends Application {
 
         primaryStage.setScene(scene);
 
-        Bubble bubble = new Bubble(scene);
+        Bubble bubble = new Bubble(scene,false);
 
         root.getChildren().add(bubble);
 

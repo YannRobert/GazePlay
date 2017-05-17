@@ -11,8 +11,10 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
@@ -29,8 +31,11 @@ public class Bubble extends Parent {
 
     EventHandler<Event> enterEvent;
     Scene scene;
+    boolean felicitation=false;
 
-    public Bubble(Scene scene) {
+    public Bubble(Scene scene,boolean felicitation) {
+
+        this.felicitation=felicitation;
 
         this.scene = scene;
 
@@ -76,9 +81,10 @@ public class Bubble extends Parent {
 
         Circle C = new Circle();
 
+
         this.getChildren().add(C);
 
-        GazeUtils.addEventFilter(C);
+      /* GazeUtils.addEventFilter(C); */
 
         C.addEventFilter(MouseEvent.ANY, enterEvent);
 
@@ -96,7 +102,13 @@ public class Bubble extends Parent {
         //C.setTranslateY((scene.getHeight() - maxRadius) * Math.random() + maxRadius);
         C.setCenterY(centerY);
         double radius = (maxRadius - minRadius) * Math.random() + minRadius;
-        C.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
+        if(felicitation){
+            Image img=new Image("file:data/imgPerso/images/bravo.gif");
+            C.setFill(new ImagePattern(img));
+        }else {
+            C.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
+        }
+
         C.setRadius(radius);
 
         Timeline timeline = new Timeline();

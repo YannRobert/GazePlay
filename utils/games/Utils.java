@@ -25,10 +25,29 @@ public class Utils {
 
     private static Bravo bravo = new Bravo();
 
-    public static Image[] getImages(String folder) {
+    public static ArrayList<String> getFolder(String folder) {
 
         File directory = new File(folder);
 
+        ArrayList<String> folders = new ArrayList<>(directory.list().length);
+
+        for(String folderPath : directory.list()){
+
+            String fileSeparator = System.getProperties().getProperty("file.separator");
+
+            String file = directory.getAbsoluteFile() + fileSeparator + folderPath;
+            folders.add(file);
+
+           /* if(file.indexOf("\\.")<0 && isImage(file)) //Problems with files starting with a point on Windows
+                images.add(new Image(file));*/
+        }
+
+        return folders;
+    }
+    public static Image[] getImages(String folder) {
+
+        File directory = new File(folder);
+        System.out.println("***** "+folder);
         ArrayList<Image> images = new ArrayList<>(directory.list().length);
 
         for(String imagePath : directory.list()){
@@ -59,7 +78,6 @@ public class Utils {
     public static boolean isImage(String file) {
 
         String mimetype= new MimetypesFileTypeMap().getContentType(file);
-
         return mimetype.startsWith("image/");
     }
 
