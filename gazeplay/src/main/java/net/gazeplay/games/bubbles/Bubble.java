@@ -18,6 +18,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.util.Duration;
+import net.gazeplay.utils.stats.Stats;
 import utils.games.Utils;
 
 import java.util.ArrayList;
@@ -47,9 +48,9 @@ public class Bubble extends Parent {
     public static final int PORTRAIT = 0;
     public static final int COLOR = 1;
 
-    public Bubble(Scene scene, Group root, int type, BubblesGamesStats stats) {
+    public Bubble(Scene scene, Group root, int type, Stats stats) {
 
-        photos = Utils.images(Utils.getImagesFolder()+"portraits"+Utils.FILESEPARATOR);
+        photos = Utils.images(Utils.getImagesFolder() + "portraits" + Utils.FILESEPARATOR);
 
         this.scene = scene;
 
@@ -70,10 +71,10 @@ public class Bubble extends Parent {
             fragment.setCenterY(-100);
 
 
-            if(type == COLOR)
+            if (type == COLOR)
                 fragment.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
             else
-                fragment.setFill(new ImagePattern(newPhoto(),0,0,1,1, true));
+                fragment.setFill(new ImagePattern(newPhoto(), 0, 0, 1, 1, true));
 
         }
 
@@ -83,26 +84,25 @@ public class Bubble extends Parent {
             @Override
             public void handle(Event e) {
 
-               // log.info(e.getEventType() + " " + e.getTarget());
+                // log.info(e.getEventType() + " " + e.getTarget());
                 if (e.getEventType() == MouseEvent.MOUSE_ENTERED || e.getEventType() == GazeEvent.GAZE_ENTERED) {
 
                     //log.info(e.getEventType());
                     enter((Circle) e.getTarget());
-                    stats.incNbGoals();
-                    stats.start();
+                    stats.onGoalReached();
+                    stats.onGoalAvailable();
                 }
             }
         };
 
         for (int i = 0; i < 10; i++) {
-
             newCircle();
         }
 
-        stats.start();
+        stats.onGoalAvailable();
     }
 
-    public void explose(Circle C){
+    public void explose(Circle C) {
 
         Timeline timeline = new Timeline();
         Timeline timeline2 = new Timeline();
@@ -138,11 +138,11 @@ public class Bubble extends Parent {
             @Override
             public void handle(ActionEvent actionEvent) {
 
-              //  nodes.removeAll(fragments);
+                //  nodes.removeAll(fragments);
             }
         });
 
-        if(Math.random()>0.5)
+        if (Math.random() > 0.5)
             Utils.playSound("data/bubble/sounds/Large-Bubble-SoundBible.com-1084083477.mp3");
         else
             Utils.playSound("data/bubble/sounds/Blop-Mark_DiAngelo-79054334.mp3");
@@ -152,7 +152,7 @@ public class Bubble extends Parent {
 
         Timeline timeline = new Timeline();
 
-        timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(target.centerXProperty(), - maxRadius*5)));
+        timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(target.centerXProperty(), -maxRadius * 5)));
 
         timeline.play();
 
@@ -178,7 +178,7 @@ public class Bubble extends Parent {
         moveCircle(C);
     }
 
-    private Circle buildCircle(){
+    private Circle buildCircle() {
 
         Circle C = new Circle();
 
@@ -186,10 +186,10 @@ public class Bubble extends Parent {
 
         C.setRadius(radius);
 
-        if(type == COLOR)
+        if (type == COLOR)
             C.setFill(new Color(Math.random(), Math.random(), Math.random(), 0.7));
         else
-            C.setFill(new ImagePattern(newPhoto(),0,0,1,1, true));
+            C.setFill(new ImagePattern(newPhoto(), 0, 0, 1, 1, true));
 
         return C;
     }
@@ -229,9 +229,9 @@ public class Bubble extends Parent {
         });
     }
 
-    protected Image newPhoto(){
+    protected Image newPhoto() {
 
-        return photos[((int)(photos.length*Math.random()))];
+        return photos[((int) (photos.length * Math.random()))];
 
     }
 }

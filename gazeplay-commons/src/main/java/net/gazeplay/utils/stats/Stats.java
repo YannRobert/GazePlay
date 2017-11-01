@@ -3,14 +3,14 @@ package net.gazeplay.utils.stats;
 import gaze.GazeEvent;
 import gaze.GazeUtils;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.gazeplay.utils.HeatMapUtils;
 import utils.games.Utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -19,299 +19,245 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by schwab on 16/08/2017.
  */
 @Slf4j
+@ToString
 public abstract class Stats {
 
-    private final int heatMapPixelSize=5;
-    private final int trail = 10;
 
-    protected String gameName;
+	private final String gameName;
 
-    protected int nbGoals;
-    protected long length;
-    protected long beginTime;
-    protected long zeroTime;
-    protected ArrayList<Integer> lengthBetweenGoals;
-    protected javafx.scene.Scene scene;
-    protected EventHandler<MouseEvent> recordMouseMovements;
-    protected EventHandler<GazeEvent> recordGazeMovements;
+	private final long minimalDurationInMillisecondsToCountGoal;
 
-    protected double[][] heatMap;
+	@Getter
+	protected int goalsCount;
 
-    public ArrayList<Integer> getLengthBetweenGoals() {
-        return lengthBetweenGoals;
-    }
+	@Getter
+	private int discardedGoalsCount;
 
-    public void printLengthBetweenGoalsToString(PrintWriter out){
+	@Getter
+	protected long totalActiveDuration;
 
-        for(Integer I : lengthBetweenGoals) {
-            out.print(I.intValue());
-            out.print(',');
-        }
-    }
+	@Getter
+	private Long startTime;
+	@Getter
+	private Long stopTime;
+	@Getter
+	private Long duration;
 
-    public Stats(Scene scene) {
+	private Long lastGoalAvailableTime;
 
-        this.scene = scene;
-        nbGoals = 0;
-        beginTime = 0;
-        length = 0;
-        zeroTime = System.currentTimeMillis();
-        lengthBetweenGoals = new ArrayList<Integer>(1000);
+	@Getter
+	private List<Long> durationsBetweenEachGoals;
 
-        log.info("GazeUtils ON : " + GazeUtils.isOn());
+	@Getter
+	private final EventHandler<MouseEvent> recordMouseMovements;
 
-        if(GazeUtils.isOn()){
+	@Getter
+	private final EventHandler<GazeEvent> recordGazeMovements;
 
-            recordGazeMovements = buildRecordGazeMovements();
-            GazeUtils.addStats(this);
-        }
-        else {
+	@Getter
+	private HeatMapState heatMapState;
 
-            recordMouseMovements = buildRecordMouseMovements();
-            scene.addEventFilter(MouseEvent.ANY, recordMouseMovements);
-        }
-        heatMap = new double[(int)scene.getHeight()/heatMapPixelSize][(int)scene.getWidth()/heatMapPixelSize];
-    }
+	public Stats(String gameName, long minimalDurationInMillisecondsToCountGoal) {
+		this.gameName = gameName;
+		this.minimalDurationInMillisecondsToCountGoal = minimalDurationInMillisecondsToCountGoal;
 
-    protected void saveRawHeatMap(File file){
+		recordGazeMovements = new GazeEventHandler(this);
+		recordMouseMovements = new MouseEventHandler(this);
+	}
 
-        PrintWriter out = null;
+	public Stats(String gameName) {
+		this(gameName, 1);
+	}
 
-        try {
-            out = new PrintWriter(file);
+	public void start(ScreenDimension screenDimension) {
+		if (startTime != null) {
+			throw new IllegalStateException("Stats already started");
+		}
+		startTime = System.currentTimeMillis();
 
-        } catch (FileNotFoundException e) {
-            log.error("Exception", e);
-        }
+		lastGoalAvailableTime = startTime;
 
-        for(int i = 0; i < heatMap.length; i++){
+		goalsCount = 0;
+		totalActiveDuration = 0;
 
-            for(int j = 0; j < heatMap[0].length-1; j++) {
+		durationsBetweenEachGoals = new ArrayList<>();
 
-                out.print((int)heatMap[i][j]);
-                out.print(", ");
-            }
+		heatMapState = new HeatMapState(screenDimension);
 
-            out.print((int)heatMap[i][heatMap[i].length-1]);
-            out.println("");
-        }
-        out.flush();
-    }
+		log.info("GazeUtils ON : " + GazeUtils.isOn());
+	}
 
-    public void savePNGHeatMap(File destination){
+	public void stop() {
+		if (stopTime != null) {
+			throw new IllegalStateException("Stats already stopped");
+		}
+		stopTime = System.currentTimeMillis();
+		duration = stopTime - startTime;
+	}
 
-        Path HeatMapPath = Paths.get(HeatMapUtils.getHeatMapPath());
-        Path dest= Paths.get(destination.getAbsolutePath());
+	public void savePNGHeatMap(File destination) {
 
-        try {
-            Files.copy(HeatMapPath, dest, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            log.error("Exception", e);
-        }
-    }
+		Path HeatMapPath = Paths.get(HeatMapUtils.getHeatMapPath());
+		Path dest = Paths.get(destination.getAbsolutePath());
 
-    public void saveStats(){
+		try {
+			Files.copy(HeatMapPath, dest, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			log.error("Exception", e);
+		}
+	}
 
-        File saveFile = new File(Utils.getStatsFolder());
-        saveFile.mkdir();
+	public void saveStats() {
 
-        File gameFolder = new File(Utils.getStatsFolder()+gameName);
-        gameFolder.mkdir();
+		File saveFile = new File(Utils.getStatsFolder());
+		saveFile.mkdir();
 
-        File savepath = new File(gameFolder.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.today());
-        savepath.mkdir();
+		File gameFolder = new File(Utils.getStatsFolder() + gameName);
+		gameFolder.mkdir();
 
-        File heatMapCSVPath = new File(savepath.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.now()+"-heatmap.csv");
-        File heatMapPNGPath = new File(savepath.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.now()+"-heatmap.png");
+		File savepath = new File(gameFolder.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.today());
+		savepath.mkdir();
 
-        saveRawHeatMap(heatMapCSVPath);
-        savePNGHeatMap(heatMapPNGPath);
-    }
+		File heatMapCSVPath = new File(savepath.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.now() + "-heatmap.csv");
+		File heatMapPNGPath = new File(savepath.getAbsoluteFile() + Utils.FILESEPARATOR + Utils.now() + "-heatmap.png");
 
-    private EventHandler<GazeEvent> buildRecordGazeMovements(){
+		heatMapState.saveRawHeatMap(heatMapCSVPath);
+		savePNGHeatMap(heatMapPNGPath);
+	}
+
 
-        return new EventHandler<GazeEvent>() {
+	public long getAverageLength() {
+		if (goalsCount == 0) {
+			return 0;
+		} else {
+			return totalActiveDuration / goalsCount;
+		}
+	}
 
-            @Override
-            public void handle(GazeEvent e) {
+	public long getMedianLength() {
+		if (goalsCount == 0) {
+			return 0;
+		} else {
 
-                incHeatMap((int) e.getX(), (int) e.getY());
-            }
-        };
-    }
+			int nbElements = durationsBetweenEachGoals.size();
 
-    private EventHandler<MouseEvent> buildRecordMouseMovements() {
+			List<Long> sortedList = new ArrayList<>(durationsBetweenEachGoals);
+			Collections.sort(sortedList);
 
-        return new EventHandler<MouseEvent>() {
+			int middle = (int) (nbElements / 2);
 
-            @Override
-            public void handle(MouseEvent e) {
+			if (nbElements % 2 == 0) {//number of elements is even, median is the average of the two central numbers
 
-                incHeatMap((int) e.getX(), (int) e.getY());
-            }
-        };
-    }
+				middle -= 1;
+				return (sortedList.get(middle) + sortedList.get(middle + 1)) / 2;
 
-    public void incHeatMap(int X, int Y){
+			} else {//number of elements is odd, median is the central number
 
-        //in heatChart, x and y are opposed
-        int x = Y/heatMapPixelSize;
-        int y = X/heatMapPixelSize;
+				return sortedList.get(middle);
+			}
+		}
+	}
 
-        for(int i = -trail; i<= trail; i++)
-            for(int j = -trail; j<= trail; j++){
+	public long getTotalLength() {
+		return duration;
+	}
 
-                if(Math.sqrt(i*i+j*j)<trail)
-                    inc(x+i,y+j);
-            }
-    }
+	public double getVariance() {
 
-    private void inc(int x, int y){
+		double average = getAverageLength();
 
-        if(x>=0&&y>=0&&x<heatMap.length&&y<heatMap[0].length)
-           // heatMap[heatMap[0].length - y][heatMap.length - x]++;
-            heatMap[x][y]++;
-    }
+		double sum = 0;
 
-    public void start(){
+		for (Long i : durationsBetweenEachGoals) {
+			sum += Math.pow((i.intValue() - average), 2);
+		}
 
-        beginTime = System.currentTimeMillis();
-    }
+		return sum / goalsCount;
+	}
 
-    public int getNbGoals() {
+	public double getSD() {
+		return Math.sqrt(getVariance());
+	}
 
-        return nbGoals;
-    }
 
-    @Override
-    public String toString() {
-        return "Stats{" +
-                "nbShoots=" + getNbGoals() +
-                ", length=" + getLength() +
-                ", average length=" + getAverageLength() +
-                ", zero time =" + getTotalLength() +
-                '}' + lengthBetweenGoals;
-    }
+	/**
+	 * called whenever the goal/target has been displayed or made available by the game to the player.
+	 * 
+	 * This does not fit all games, as some game may have multiple target available at the same time.
+	 * This better fit games where only 1 goal/target is available at anytime.
+	 * 
+	 * This method is needed in case a new goal/target is not available immediatly when the previous goal/target was reached.
+	 * Sometime the game waits for a few seconds after a target has been reached before making a new one available.
+	 * 
+	 * This permits to measure the actual duration it took to the player between the time the goal is available and the time the goal is reached by the player.
+	 */
+	public void onGoalAvailable() {
+		long newGoalAvailableTime = System.currentTimeMillis();
+		lastGoalAvailableTime = newGoalAvailableTime;
+	}
 
-    public long getLength() {
+	/**
+	 * called whenever a goal/target has been reached by the player
+	 */
+	public void onGoalReached() {
+		long newGoalReachedTime = System.currentTimeMillis();
+		long durationSinceGoalAvailable = newGoalReachedTime - lastGoalAvailableTime;
+		//
+		if (durationSinceGoalAvailable < minimalDurationInMillisecondsToCountGoal) {
+			discardedGoalsCount++;
+		} else {
+			// reset the lastGoalAvailableTime property, in case the game does not call onGoalAvailable()
+			lastGoalAvailableTime = newGoalReachedTime;
 
-        return length;
-    }
+			//
+			goalsCount++;
+			totalActiveDuration += durationSinceGoalAvailable;
+			durationsBetweenEachGoals.add(durationSinceGoalAvailable);
+		}
+	}
 
-    public long getAverageLength(){
+	public List<Long> getSortedLengthBetweenGoals() {
 
-        if(nbGoals == 0)
-            return 0;
-        else
-            return getLength()/ nbGoals;
-    }
+		int nbElements = durationsBetweenEachGoals.size();
 
-    public long getMedianLength(){
+		List<Long> sortedList = new ArrayList<>(durationsBetweenEachGoals);
+		Collections.sort(sortedList);
 
-        if(nbGoals == 0)
-            return 0;
-        else {
+		List<Long> normalList = new ArrayList<>(durationsBetweenEachGoals);
 
-            int nbElements = lengthBetweenGoals.size();
+		// What is the purpose of this ?
+		// What is the expected result ?
 
-            ArrayList<Integer> sortedList = (ArrayList<Integer>)lengthBetweenGoals.clone();
+		int j = 0;
 
-            Collections.sort(sortedList);
+		for (int i = 0; i < nbElements; i++) {
 
-            int middle = (int)(nbElements/2);
+			if (i % 2 == 0)
+				normalList.set(j, sortedList.get(i));
+			else {
+				normalList.set(nbElements - 1 - j, sortedList.get(i));
+				j++;
+			}
+		}
 
-            if(nbElements%2==0){//number of elements is even, median is the average of the two central numbers
+		return normalList;
+	}
 
-                middle-=1;
-                return (sortedList.get(middle)+sortedList.get(middle+1))/2;
+	protected String getTodayFolder() {
+		return Utils.getStatsFolder() + gameName + Utils.FILESEPARATOR + Utils.today() + Utils.FILESEPARATOR;
+	}
 
-            }else{//number of elements is odd, median is the central number
 
-                return sortedList.get(middle);
-            }
-        }
-    }
-
-    public long getTotalLength() {
-
-        return System.currentTimeMillis() - zeroTime;
-    }
-
-    public double getVariance() {
-
-        double average = getAverageLength();
-
-        double sum = 0;
-
-        for(Integer I : lengthBetweenGoals){
-
-            sum+=Math.pow((I.intValue()-average),2);
-        }
-
-        return sum/ nbGoals;
-    }
-
-    public double getSD() {
-
-        return Math.sqrt(getVariance());
-    }
-
-    public double[][] getHeatMap() {
-        return heatMap;
-    }
-
-    public void stop() {
-
-        if(GazeUtils.isOn()){
-
-            scene.removeEventFilter(GazeEvent.ANY, recordGazeMovements);
-        }
-        else {
-
-            scene.removeEventFilter(MouseEvent.ANY, recordMouseMovements);
-        }
-    }
-
-    public void incNbGoals(){
-
-        long last = System.currentTimeMillis() - beginTime;
-        nbGoals++;
-        length += last;
-        lengthBetweenGoals.add((new Long(last)).intValue());
-    }
-
-    public ArrayList<Integer> getSortedLengthBetweenGoals(){
-
-        int nbElements = lengthBetweenGoals.size();
-
-        ArrayList<Integer> sortedList = (ArrayList<Integer>)lengthBetweenGoals.clone();
-
-        Collections.sort(sortedList);
-
-        ArrayList<Integer> normalList = (ArrayList<Integer>)lengthBetweenGoals.clone();
-
-        int j = 0;
-
-        for(int i = 0; i < nbElements ; i++) {
-
-            if(i%2 == 0)
-                normalList.set(j, sortedList.get(i));
-            else {
-                normalList.set(nbElements -1 - j, sortedList.get(i));
-                j++;
-            }
-        }
-
-        return normalList;
-    }
-
-    protected String getTodayFolder(){
-
-        return Utils.getStatsFolder() + gameName + Utils.FILESEPARATOR + Utils.today() + Utils.FILESEPARATOR;
-    }
+	public void printLengthBetweenGoalsToString(PrintWriter out) {
+		for (Long i : durationsBetweenEachGoals) {
+			out.print(i);
+			out.print(',');
+		}
+	}
 }

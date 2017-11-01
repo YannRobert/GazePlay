@@ -1,6 +1,7 @@
 package net.gazeplay.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import net.gazeplay.utils.stats.HeatMapState;
 import org.tc33.jheatchart.HeatChart;
 import utils.games.Utils;
 
@@ -12,10 +13,10 @@ public class HeatMapUtils {
 
 	private static final String heatMapFileName = "java-heat-chart.png";
 
-	public static void buildHeatMap(double[][] data){
+	public static void buildHeatMap(HeatMapState heatMapState){
 
 		// Step 1: Create our heat map chart using our data.
-		HeatChart map = new HeatChart(data);
+		HeatChart map = new HeatChart(heatMapState.getHeatMap());
 
 		map.setHighValueColour(java.awt.Color.RED);
 		map.setLowValueColour(java.awt.Color.lightGray);

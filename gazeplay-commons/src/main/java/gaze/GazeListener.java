@@ -48,7 +48,7 @@ public abstract class GazeListener {
 
         if(GazeUtils.stats != null) {
 
-            GazeUtils.stats.incHeatMap((int)gazePosition.getX(), (int)gazePosition.getY());
+            GazeUtils.stats.getHeatMapState().appendToHeatMap((int)gazePosition.getX(), (int)gazePosition.getY());
         }
 
         for(GazeInfos gi : shapesEventFilter){

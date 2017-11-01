@@ -25,8 +25,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.gazeplay.utils.Bravo;
 import net.gazeplay.utils.HomeUtils;
-import utils.games.Utils;
 import net.gazeplay.utils.stats.HiddenItemsGamesStats;
+import net.gazeplay.utils.stats.Stats;
+import utils.games.Utils;
 
 public class Blocs extends Application {
 
@@ -46,7 +47,8 @@ public class Blocs extends Application {
     private static final int trail = 10;
     private static Image[] images;
 
-    public static void main(String[] args) {Application.launch(args);
+    public static void main(String[] args) {
+        Application.launch(args);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class Blocs extends Application {
 
         primaryStage.setScene(theScene);
 
-        HiddenItemsGamesStats stats = new HiddenItemsGamesStats(theScene);
+        HiddenItemsGamesStats stats = new HiddenItemsGamesStats("Blocs");
 
         makeBlocks(theScene, blockRoot, null, 2, 2, true, 1, false, stats);
 
@@ -73,15 +75,15 @@ public class Blocs extends Application {
         SecondScreen secondScreen = SecondScreen.launch();
     }
 
-    public static void makeBlocks(Scene scene, Group root, ChoiceBox<String> cbxGames, int nbLines, int nbColomns, boolean colors, float percents4Win, boolean useTrail, HiddenItemsGamesStats stats){
+    public static void makeBlocks(Scene scene, Group root, ChoiceBox<String> cbxGames, int nbLines, int nbColomns, boolean colors, float percents4Win, boolean useTrail, Stats stats) {
 
-        images = Utils.images(Utils.getImagesFolder()+"blocs"+Utils.FILESEPARATOR);
+        images = Utils.images(Utils.getImagesFolder() + "blocs" + Utils.FILESEPARATOR);
 
         finished = false;
 
         p4w = percents4Win;
 
-        blockRoot=root;
+        blockRoot = root;
 
         nColomns = nbColomns;
 
@@ -95,7 +97,7 @@ public class Blocs extends Application {
 
         blocs = new Bloc[nbColomns][nbLines];
 
-        int value = (int)Math.floor(Math.random()*images.length);
+        int value = (int) Math.floor(Math.random() * images.length);
 
         scene.setFill(new ImagePattern(images[value]));
 
@@ -108,14 +110,15 @@ public class Blocs extends Application {
 
         count = initCount;
 
-        for (int i = 0; i < nbColomns; i++)
+        for (int i = 0; i < nbColomns; i++) {
             for (int j = 0; j < nbLines; j++) {
 
-                Bloc bloc = new Bloc(i * width, j * height, width+1, height+1,i ,j);//width+1, height+1 to avoid spaces between blocks for Scratchcard
-                if(colors)
+                Bloc bloc = new Bloc(i * width, j * height, width + 1, height + 1, i, j);//width+1, height+1 to avoid spaces between blocks for Scratchcard
+                if (colors) {
                     bloc.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
-                else
+                } else {
                     bloc.setFill(Color.BLACK);
+                }
                 root.getChildren().add(bloc);
                 blocs[i][j] = bloc;
 
@@ -127,8 +130,9 @@ public class Blocs extends Application {
 
                 bloc.addEventFilter(GazeEvent.ANY, enterEvent);
 
-                stats.start();
+                stats.onGoalAvailable();
             }
+        }
     }
 
     private static void RemoveAllBlocs() {
@@ -144,7 +148,7 @@ public class Blocs extends Application {
 
                     @Override
                     protected Void call() throws Exception {
-                        for (int i = 0; i < maxX; i++){
+                        for (int i = 0; i < maxX; i++) {
                             for (int j = 0; j < maxY; j++) {
 
                                 removeBloc(blocs[i][j]);
@@ -159,7 +163,7 @@ public class Blocs extends Application {
         calculateService.start();
     }
 
-    private static void removeBloc(Bloc toRemove){
+    private static void removeBloc(Bloc toRemove) {
 
         /*
         log.info("##############");
@@ -168,7 +172,7 @@ public class Blocs extends Application {
         log.info(toRemove.posY);
         log.info("##############");
 */
-        if(toRemove==null)
+        if (toRemove == null)
             return;
 
         toRemove.removeEventFilter(MouseEvent.ANY, enterEvent);
@@ -180,7 +184,7 @@ public class Blocs extends Application {
         count--;
     }
 
-    private static EventHandler<Event> buildEvent(HiddenItemsGamesStats stats, boolean useTrail) {
+    private static EventHandler<Event> buildEvent(Stats stats, boolean useTrail) {
         return new EventHandler<Event>() {
             @Override
             public void handle(Event e) {
@@ -188,22 +192,21 @@ public class Blocs extends Application {
                 //log.info("useTrail = " + useTrail);
                 //log.info("e.getEventType() = " + e.getEventType());
 
-                if(e.getEventType().equals(MouseEvent.MOUSE_ENTERED) || e.getEventType().equals(GazeEvent.GAZE_ENTERED)) {
+                if (e.getEventType().equals(MouseEvent.MOUSE_ENTERED) || e.getEventType().equals(GazeEvent.GAZE_ENTERED)) {
 
-                    if(! useTrail) {
+                    if (!useTrail) {
 
                         Bloc bloc = (Bloc) e.getTarget();
                         removeBloc(bloc);
-                    }
-                    else {
+                    } else {
 
                         Bloc bloc = (Bloc) e.getTarget();
 
                         int posX = bloc.posX;
                         int posY = bloc.posY;
 
-                       // log.info(bloc.posX);
-                       // log.info(bloc.posY);
+                        // log.info(bloc.posX);
+                        // log.info(bloc.posY);
 
                         int maxX = blocs.length;
                         int maxY = blocs[0].length;
@@ -221,29 +224,29 @@ public class Blocs extends Application {
                         }
                     }
 
-                    if(((float)initCount-count)/initCount >= p4w && !finished){
+                    if (((float) initCount - count) / initCount >= p4w && !finished) {
 
                         finished = true;
 
-                        stats.incNbGoals();
+                        stats.onGoalReached();
 
                         RemoveAllBlocs();
 
-                       HomeUtils.home.setVisible(false);
+                        HomeUtils.home.setVisible(false);
 
-                        bravo.win().setOnFinished(event ->{
+                        bravo.win().setOnFinished(event -> {
                             HomeUtils.clear(theScene, blockRoot, choiceBox);
-                                makeBlocks(theScene, blockRoot, choiceBox, nLines, nColomns, hasColors, p4w, useTrail, stats);
+                            makeBlocks(theScene, blockRoot, choiceBox, nLines, nColomns, hasColors, p4w, useTrail, stats);
                             HomeUtils.home(theScene, blockRoot, choiceBox, stats);
-                            });
-                        }
+                        });
                     }
                 }
-            };
-        }
+            }
+        };
     }
+}
 
-class Bloc extends Rectangle{
+class Bloc extends Rectangle {
 
     public int posX;
     public int posY;
@@ -251,7 +254,7 @@ class Bloc extends Rectangle{
 
     public Bloc(double x, double y, double width, double height, int posX, int posY) {
         super(x, y, width, height);
-        this.posX=posX;
-        this.posY=posY;
+        this.posX = posX;
+        this.posY = posY;
     }
 }

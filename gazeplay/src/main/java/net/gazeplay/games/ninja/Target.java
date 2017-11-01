@@ -10,9 +10,8 @@ import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Screen;
-import net.gazeplay.utils.Portrait;
 import javafx.util.Duration;
-import net.gazeplay.utils.stats.ShootGamesStats;
+import net.gazeplay.utils.Portrait;
 import net.gazeplay.utils.stats.Stats;
 import utils.games.Utils;
 
@@ -37,7 +36,7 @@ public class Target extends Portrait {
 
     private ArrayList<Portrait> portraits = new ArrayList(nbBall);
 
-    public Target(Group root, ShootGamesStats shoottats) {
+    public Target(Group root, Stats shoottats) {
 
         super(radius);
 
@@ -60,7 +59,7 @@ public class Target extends Portrait {
 
         move();
 
-        stats.start();
+        stats.onGoalAvailable();
     }
 
     private EventHandler<Event> buildEvent() {
@@ -77,10 +76,10 @@ public class Target extends Portrait {
         };
     }
 
-    private void move(){
+    private void move() {
 
         Timeline timeline = new Timeline();
-        int length = (int)(2000*Math.random())+1000;//between 1 and 3 seconds
+        int length = (int) (2000 * Math.random()) + 1000;//between 1 and 3 seconds
         timeline.getKeyFrames().add(new KeyFrame(new Duration(length), new KeyValue(centerXProperty(), newX())));
         timeline.getKeyFrames().add(new KeyFrame(new Duration(length), new KeyValue(centerYProperty(), newY())));
 
@@ -97,9 +96,9 @@ public class Target extends Portrait {
 
     }
 
-    private void enter(){
+    private void enter() {
 
-        stats.incNbGoals();
+        stats.onGoalReached();
 
         //this.removeEventHandler(MouseEvent.MOUSE_ENTERED, enterEvent);
 
@@ -109,22 +108,22 @@ public class Target extends Portrait {
         Timeline timeline4 = new Timeline();
 
 
-        timeline.getKeyFrames().add(new KeyFrame(new Duration(100),new KeyValue(radiusProperty(), ballRadius)));
-        timeline.getKeyFrames().add(new KeyFrame(new Duration(100),new KeyValue(opacityProperty(), 0.5)));
+        timeline.getKeyFrames().add(new KeyFrame(new Duration(100), new KeyValue(radiusProperty(), ballRadius)));
+        timeline.getKeyFrames().add(new KeyFrame(new Duration(100), new KeyValue(opacityProperty(), 0.5)));
 
-        timeline2.getKeyFrames().add(new KeyFrame(new Duration(1),new KeyValue(opacityProperty(), 0)));
+        timeline2.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(opacityProperty(), 0)));
 
         for (int i = 0; i < nbBall; i++) {
 
             Portrait P = portraits.get(i);
 
-            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1),new KeyValue(P.centerXProperty(), getCenterX())));
-            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1),new KeyValue(P.centerYProperty(), getCenterY())));
+            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(P.centerXProperty(), getCenterX())));
+            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(P.centerYProperty(), getCenterY())));
             timeline2.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(P.opacityProperty(), 1)));
 
-            double XendValue = Math.random()* Screen.getPrimary().getBounds().getWidth();
-            double YendValue = Math.random()* Screen.getPrimary().getBounds().getHeight();
-            timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000),new KeyValue(P.centerYProperty(), YendValue, Interpolator.EASE_OUT)));
+            double XendValue = Math.random() * Screen.getPrimary().getBounds().getWidth();
+            double YendValue = Math.random() * Screen.getPrimary().getBounds().getHeight();
+            timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(P.centerYProperty(), YendValue, Interpolator.EASE_OUT)));
             timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(P.centerXProperty(), XendValue, Interpolator.EASE_OUT)));
             timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(P.opacityProperty(), 0)));
         }
@@ -132,10 +131,10 @@ public class Target extends Portrait {
         timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(radiusProperty(), radius)));
         timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(centerXProperty(), newX())));
         timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(centerYProperty(), newY())));
-        timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(fillProperty(), new ImagePattern(newPhoto(), 0, 0, 1,1, true))));
-        timeline4.getKeyFrames().add(new KeyFrame(new Duration(1),new KeyValue(opacityProperty(), 1)));
+        timeline3.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(fillProperty(), new ImagePattern(newPhoto(), 0, 0, 1, 1, true))));
+        timeline4.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(opacityProperty(), 1)));
 
-        SequentialTransition sequence = new SequentialTransition(timeline,timeline2, timeline3, timeline4);
+        SequentialTransition sequence = new SequentialTransition(timeline, timeline2, timeline3, timeline4);
 
         sequence.play();
 
@@ -146,7 +145,7 @@ public class Target extends Portrait {
 
                 anniOff = true;
 
-                stats.start();
+                stats.onGoalAvailable();
             }
         });
 
