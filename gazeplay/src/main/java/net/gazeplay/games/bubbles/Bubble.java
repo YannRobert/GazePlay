@@ -36,7 +36,7 @@ public class Bubble extends Parent {
     private final int maxTimeLength = 7;
     private final int minTimeLength = 4;
 
-    private final int nbFragments = 10; //number of little circles after explosion
+    private final int nbFragments = 10; // number of little circles after explosion
 
     private ArrayList<Circle> fragments = new ArrayList(nbFragments);
 
@@ -70,7 +70,6 @@ public class Bubble extends Parent {
             fragment.setCenterX(-100);
             fragment.setCenterY(-100);
 
-
             if (type == COLOR)
                 fragment.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
             else
@@ -87,7 +86,7 @@ public class Bubble extends Parent {
                 // log.info(e.getEventType() + " " + e.getTarget());
                 if (e.getEventType() == MouseEvent.MOUSE_ENTERED || e.getEventType() == GazeEvent.GAZE_ENTERED) {
 
-                    //log.info(e.getEventType());
+                    // log.info(e.getEventType());
                     enter((Circle) e.getTarget());
                     stats.onGoalReached();
                     stats.onGoalAvailable();
@@ -111,19 +110,22 @@ public class Bubble extends Parent {
 
             Circle fragment = fragments.get(i);
 
-           /* fragment.setCenterX(C.getCenterX());
-            fragment.setCenterY(C.getCenterY());
-            fragment.setOpacity(1);*/
-            timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(fragment.centerXProperty(), C.getCenterX(), Interpolator.LINEAR)));
-            timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(fragment.centerYProperty(), C.getCenterY(), Interpolator.EASE_OUT)));
+            /*
+             * fragment.setCenterX(C.getCenterX()); fragment.setCenterY(C.getCenterY()); fragment.setOpacity(1);
+             */
+            timeline.getKeyFrames().add(new KeyFrame(new Duration(1),
+                    new KeyValue(fragment.centerXProperty(), C.getCenterX(), Interpolator.LINEAR)));
+            timeline.getKeyFrames().add(new KeyFrame(new Duration(1),
+                    new KeyValue(fragment.centerYProperty(), C.getCenterY(), Interpolator.EASE_OUT)));
             timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(fragment.opacityProperty(), 1)));
-
 
             double XendValue = Math.random() * Screen.getPrimary().getBounds().getWidth();
             double YendValue = Math.random() * Screen.getPrimary().getBounds().getHeight();
 
-            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(fragment.centerXProperty(), XendValue, Interpolator.LINEAR)));
-            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(fragment.centerYProperty(), YendValue, Interpolator.EASE_OUT)));
+            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1000),
+                    new KeyValue(fragment.centerXProperty(), XendValue, Interpolator.LINEAR)));
+            timeline2.getKeyFrames().add(new KeyFrame(new Duration(1000),
+                    new KeyValue(fragment.centerYProperty(), YendValue, Interpolator.EASE_OUT)));
             timeline2.getKeyFrames().add(new KeyFrame(new Duration(1000), new KeyValue(fragment.opacityProperty(), 0)));
         }
 
@@ -138,7 +140,7 @@ public class Bubble extends Parent {
             @Override
             public void handle(ActionEvent actionEvent) {
 
-                //  nodes.removeAll(fragments);
+                // nodes.removeAll(fragments);
             }
         });
 
@@ -152,7 +154,8 @@ public class Bubble extends Parent {
 
         Timeline timeline = new Timeline();
 
-        timeline.getKeyFrames().add(new KeyFrame(new Duration(1), new KeyValue(target.centerXProperty(), -maxRadius * 5)));
+        timeline.getKeyFrames()
+                .add(new KeyFrame(new Duration(1), new KeyValue(target.centerXProperty(), -maxRadius * 5)));
 
         timeline.play();
 
@@ -200,21 +203,23 @@ public class Bubble extends Parent {
         double centerY = scene.getHeight();
 
         C.setCenterX(centerX);
-        //C.setTranslateY((scene.getHeight() - maxRadius) * Math.random() + maxRadius);
+        // C.setTranslateY((scene.getHeight() - maxRadius) * Math.random() + maxRadius);
         C.setCenterY(centerY);
 
         Timeline timeline = new Timeline();
 
         double timelength = ((maxTimeLength - minTimeLength) * Math.random() + minTimeLength) * 1000;
 
-        timeline.getKeyFrames().add(new KeyFrame(new Duration(timelength), new KeyValue(C.centerYProperty(), 0 - maxRadius, Interpolator.EASE_IN)));
+        timeline.getKeyFrames().add(new KeyFrame(new Duration(timelength),
+                new KeyValue(C.centerYProperty(), 0 - maxRadius, Interpolator.EASE_IN)));
 
-       /* SequentialTransition sequence = new SequentialTransition();
-
-        for(int i = 0; i < 10; i++) {
-            sequence.getChildren().add(new KeyFrame(new Duration(timelength / 10), new KeyValue(C.centerXProperty(), centerX - 100)));
-            sequence.getChildren().add(new KeyFrame(new Duration(timelength / 10), new KeyValue(C.centerXProperty(), centerX + 100)));
-        }*/
+        /*
+         * SequentialTransition sequence = new SequentialTransition();
+         * 
+         * for(int i = 0; i < 10; i++) { sequence.getChildren().add(new KeyFrame(new Duration(timelength / 10), new
+         * KeyValue(C.centerXProperty(), centerX - 100))); sequence.getChildren().add(new KeyFrame(new
+         * Duration(timelength / 10), new KeyValue(C.centerXProperty(), centerX + 100))); }
+         */
 
         timeline.play();
 
@@ -223,7 +228,7 @@ public class Bubble extends Parent {
             @Override
             public void handle(ActionEvent actionEvent) {
 
-                //moveCircle(C);
+                // moveCircle(C);
                 newCircle();
             }
         });

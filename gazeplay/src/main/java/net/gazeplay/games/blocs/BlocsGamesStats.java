@@ -8,5 +8,4 @@ public class BlocsGamesStats extends HiddenItemsGamesStats {
         super("blocs");
     }
 
-
 }

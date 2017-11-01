@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GazeEventHandler implements EventHandler<GazeEvent> {
 
-	private final Stats stats;
+    private final Stats stats;
 
-	@Override
-	public void handle(GazeEvent e) {
-		stats.getHeatMapState().appendToHeatMap((int) e.getX(), (int) e.getY());
-	}
+    @Override
+    public void handle(GazeEvent e) {
+        stats.getHeatMapState().appendToHeatMap((int) e.getX(), (int) e.getY());
+    }
 }

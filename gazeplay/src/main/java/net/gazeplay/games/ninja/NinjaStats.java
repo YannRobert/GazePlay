@@ -4,8 +4,8 @@ import net.gazeplay.utils.stats.ShootGamesStats;
 
 public class NinjaStats extends ShootGamesStats {
 
-	public NinjaStats() {
-		super("ninja");
-	}
+    public NinjaStats() {
+        super("ninja");
+    }
 
 }

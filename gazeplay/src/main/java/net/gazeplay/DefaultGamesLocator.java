@@ -19,7 +19,6 @@ import java.util.List;
 @Slf4j
 public class DefaultGamesLocator implements GamesLocator {
 
-
     @Override
     public List<GameSpec> listGames() {
 
@@ -35,25 +34,29 @@ public class DefaultGamesLocator implements GamesLocator {
             return stats;
         }));
 
-        result.add(new GameSpec("Magic Cards (2x2)", MagicCardsGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Card.addCards(root, scene, cbxGames, 2, 2, stats);
-            return stats;
-        }));
+        result.add(new GameSpec("Magic Cards (2x2)", MagicCardsGamesStats::new,
+                (gameSpec, stats, scene, root, cbxGames) -> {
+                    Card.addCards(root, scene, cbxGames, 2, 2, stats);
+                    return stats;
+                }));
 
-        result.add(new GameSpec("Magic Cards (2x3)", MagicCardsGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Card.addCards(root, scene, cbxGames, 2, 3, stats);
-            return stats;
-        }));
+        result.add(new GameSpec("Magic Cards (2x3)", MagicCardsGamesStats::new,
+                (gameSpec, stats, scene, root, cbxGames) -> {
+                    Card.addCards(root, scene, cbxGames, 2, 3, stats);
+                    return stats;
+                }));
 
-        result.add(new GameSpec("Magic Cards (3x2)", MagicCardsGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Card.addCards(root, scene, cbxGames, 3, 2, stats);
-            return stats;
-        }));
+        result.add(new GameSpec("Magic Cards (3x2)", MagicCardsGamesStats::new,
+                (gameSpec, stats, scene, root, cbxGames) -> {
+                    Card.addCards(root, scene, cbxGames, 3, 2, stats);
+                    return stats;
+                }));
 
-        result.add(new GameSpec("Magic Cards (3x3)", MagicCardsGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Card.addCards(root, scene, cbxGames, 3, 3, stats);
-            return stats;
-        }));
+        result.add(new GameSpec("Magic Cards (3x3)", MagicCardsGamesStats::new,
+                (gameSpec, stats, scene, root, cbxGames) -> {
+                    Card.addCards(root, scene, cbxGames, 3, 3, stats);
+                    return stats;
+                }));
 
         result.add(new GameSpec("blocks (2x2)", BlocsGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
             Blocs.makeBlocks(scene, root, cbxGames, 2, 2, true, 1, false, stats);
@@ -70,21 +73,22 @@ public class DefaultGamesLocator implements GamesLocator {
             return stats;
         }));
 
-        result.add(new GameSpec("Carte à gratter", ScratchcardGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Blocs.makeBlocks(scene, root, cbxGames, 100, 100, false, 0.6f, true, stats);
-            return stats;
-        }));
+        result.add(new GameSpec("Carte à gratter", ScratchcardGamesStats::new,
+                (gameSpec, stats, scene, root, cbxGames) -> {
+                    Blocs.makeBlocks(scene, root, cbxGames, 100, 100, false, 0.6f, true, stats);
+                    return stats;
+                }));
 
         result.add(new GameSpec("Colored Bubbles", BubblesGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
             Bubble bubble = new Bubble(scene, root, Bubble.COLOR, stats);
             return stats;
         }));
 
-        result.add(new GameSpec("Portrait Bubbles", BubblesGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
-            Bubble bubble = new Bubble(scene, root, Bubble.PORTRAIT, stats);
-            return stats;
-        }));
-
+        result.add(
+                new GameSpec("Portrait Bubbles", BubblesGamesStats::new, (gameSpec, stats, scene, root, cbxGames) -> {
+                    Bubble bubble = new Bubble(scene, root, Bubble.PORTRAIT, stats);
+                    return stats;
+                }));
 
         log.info("Games found : " + result.size());
 

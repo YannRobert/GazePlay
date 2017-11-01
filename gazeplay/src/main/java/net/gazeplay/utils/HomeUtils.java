@@ -51,7 +51,6 @@ public class HomeUtils {
         root.getChildren().add(home);
     }
 
-
     public static void goHome(Scene scene, Group root, ChoiceBox<String> cbxGames) {
         clear(scene, root, cbxGames);
 
@@ -79,7 +78,6 @@ public class HomeUtils {
 
         root.getChildren().add(Bravo.getBravo());
 
-
     }
 
     public static void addButtons(Scene scene, Group root, ChoiceBox<String> cbxGames) {
@@ -90,7 +88,7 @@ public class HomeUtils {
         double XLicence = scene.getWidth() * 0.0;
         double Y = scene.getHeight() - heigth * 1.1;
 
-        //  License license = new License(XLicence, Y, width, heigth, scene, root, cbxGames);
+        // License license = new License(XLicence, Y, width, heigth, scene, root, cbxGames);
 
         // root.getChildren().add(license);
 
@@ -134,6 +132,5 @@ public class HomeUtils {
 
         return logo;
     }
-
 
 }

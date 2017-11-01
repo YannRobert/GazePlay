@@ -60,7 +60,8 @@ public class Blocs extends Application {
 
         blockRoot = new Group();
 
-        theScene = new Scene(blockRoot, Screen.getScreens().get(0).getWidth(), Screen.getScreens().get(0).getHeight(), Color.BLACK);
+        theScene = new Scene(blockRoot, Screen.getScreens().get(0).getWidth(), Screen.getScreens().get(0).getHeight(),
+                Color.BLACK);
 
         primaryStage.setOnCloseRequest((WindowEvent we) -> System.exit(0));
 
@@ -75,7 +76,8 @@ public class Blocs extends Application {
         SecondScreen secondScreen = SecondScreen.launch();
     }
 
-    public static void makeBlocks(Scene scene, Group root, ChoiceBox<String> cbxGames, int nbLines, int nbColomns, boolean colors, float percents4Win, boolean useTrail, Stats stats) {
+    public static void makeBlocks(Scene scene, Group root, ChoiceBox<String> cbxGames, int nbLines, int nbColomns,
+            boolean colors, float percents4Win, boolean useTrail, Stats stats) {
 
         images = Utils.images(Utils.getImagesFolder() + "blocs" + Utils.FILESEPARATOR);
 
@@ -113,7 +115,9 @@ public class Blocs extends Application {
         for (int i = 0; i < nbColomns; i++) {
             for (int j = 0; j < nbLines; j++) {
 
-                Bloc bloc = new Bloc(i * width, j * height, width + 1, height + 1, i, j);//width+1, height+1 to avoid spaces between blocks for Scratchcard
+                Bloc bloc = new Bloc(i * width, j * height, width + 1, height + 1, i, j);// width+1, height+1 to avoid
+                                                                                         // spaces between blocks for
+                                                                                         // Scratchcard
                 if (colors) {
                     bloc.setFill(new Color(Math.random(), Math.random(), Math.random(), 1));
                 } else {
@@ -166,12 +170,9 @@ public class Blocs extends Application {
     private static void removeBloc(Bloc toRemove) {
 
         /*
-        log.info("##############");
-        log.info("#####TO REMOVE#########");
-        log.info(toRemove.posX);
-        log.info(toRemove.posY);
-        log.info("##############");
-*/
+         * log.info("##############"); log.info("#####TO REMOVE#########"); log.info(toRemove.posX);
+         * log.info(toRemove.posY); log.info("##############");
+         */
         if (toRemove == null)
             return;
 
@@ -180,7 +181,7 @@ public class Blocs extends Application {
         GazeUtils.removeEventFilter(toRemove);
         toRemove.setTranslateX(-10000);
         toRemove.setOpacity(0);
-        //blockRoot.getChildren().remove(toRemove);
+        // blockRoot.getChildren().remove(toRemove);
         count--;
     }
 
@@ -189,10 +190,11 @@ public class Blocs extends Application {
             @Override
             public void handle(Event e) {
 
-                //log.info("useTrail = " + useTrail);
-                //log.info("e.getEventType() = " + e.getEventType());
+                // log.info("useTrail = " + useTrail);
+                // log.info("e.getEventType() = " + e.getEventType());
 
-                if (e.getEventType().equals(MouseEvent.MOUSE_ENTERED) || e.getEventType().equals(GazeEvent.GAZE_ENTERED)) {
+                if (e.getEventType().equals(MouseEvent.MOUSE_ENTERED)
+                        || e.getEventType().equals(GazeEvent.GAZE_ENTERED)) {
 
                     if (!useTrail) {
 
@@ -214,9 +216,11 @@ public class Blocs extends Application {
                         for (int i = -trail; i < trail; i++) {
                             for (int j = -trail; j < trail; j++) {
 
-                                //log.info(Math.sqrt(i * i + j * j) + " : " + maxX + ", " + maxY + ", " + (posX + i) + ", " + (posY + j));
-                                if (Math.sqrt(i * i + j * j) <= trail && posX + i >= 0 && posY + j >= 0 && posX + i < maxX && posY + j < maxY) {
-                                    //log.info("à supprimer");
+                                // log.info(Math.sqrt(i * i + j * j) + " : " + maxX + ", " + maxY + ", " + (posX + i) +
+                                // ", " + (posY + j));
+                                if (Math.sqrt(i * i + j * j) <= trail && posX + i >= 0 && posY + j >= 0
+                                        && posX + i < maxX && posY + j < maxY) {
+                                    // log.info("à supprimer");
                                     removeBloc(blocs[posX + i][posY + j]);
                                     blocs[posX + i][posY + j] = null;
                                 }
@@ -236,7 +240,8 @@ public class Blocs extends Application {
 
                         bravo.win().setOnFinished(event -> {
                             HomeUtils.clear(theScene, blockRoot, choiceBox);
-                            makeBlocks(theScene, blockRoot, choiceBox, nLines, nColomns, hasColors, p4w, useTrail, stats);
+                            makeBlocks(theScene, blockRoot, choiceBox, nLines, nColomns, hasColors, p4w, useTrail,
+                                    stats);
                             HomeUtils.home(theScene, blockRoot, choiceBox, stats);
                         });
                     }
@@ -250,7 +255,6 @@ class Bloc extends Rectangle {
 
     public int posX;
     public int posY;
-
 
     public Bloc(double x, double y, double width, double height, int posX, int posY) {
         super(x, y, width, height);

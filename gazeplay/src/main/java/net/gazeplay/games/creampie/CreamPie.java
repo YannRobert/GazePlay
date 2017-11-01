@@ -29,7 +29,8 @@ public class CreamPie extends Application {
 
         Group root = new Group();
 
-        Scene scene = new Scene(root, com.sun.glass.ui.Screen.getScreens().get(0).getWidth(), com.sun.glass.ui.Screen.getScreens().get(0).getHeight(), Color.BLACK);
+        Scene scene = new Scene(root, com.sun.glass.ui.Screen.getScreens().get(0).getWidth(),
+                com.sun.glass.ui.Screen.getScreens().get(0).getHeight(), Color.BLACK);
 
         Stats stats = new ShootGamesStats("CreamPie");
 

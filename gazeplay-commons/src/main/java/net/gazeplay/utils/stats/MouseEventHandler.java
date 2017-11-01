@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MouseEventHandler implements EventHandler<MouseEvent> {
 
-	private final Stats stats;
+    private final Stats stats;
 
-	@Override
-	public void handle(MouseEvent e) {
-		stats.getHeatMapState().appendToHeatMap((int) e.getX(), (int) e.getY());
-	}
+    @Override
+    public void handle(MouseEvent e) {
+        stats.getHeatMapState().appendToHeatMap((int) e.getX(), (int) e.getY());
+    }
 }
