@@ -18,6 +18,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.util.Duration;
+import net.gazeplay.utils.stats.Stats;
 import utils.games.Utils;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Bubble extends Parent {
     public static final int PORTRAIT = 0;
     public static final int COLOR = 1;
 
-    public Bubble(Scene scene, Group root, int type, BubblesGamesStats stats) {
+    public Bubble(Scene scene, Group root, int type, Stats stats) {
 
         photos = Utils.images(Utils.getImagesFolder() + "portraits" + Utils.FILESEPARATOR);
 
@@ -87,18 +88,17 @@ public class Bubble extends Parent {
 
                     // log.info(e.getEventType());
                     enter((Circle) e.getTarget());
-                    stats.incNbGoals();
-                    stats.start();
+                    stats.onGoalReached();
+                    stats.onGoalAvailable();
                 }
             }
         };
 
         for (int i = 0; i < 10; i++) {
-
             newCircle();
         }
 
-        stats.start();
+        stats.onGoalAvailable();
     }
 
     public void explose(Circle C) {

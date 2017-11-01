@@ -13,7 +13,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.util.Duration;
 import net.gazeplay.utils.Portrait;
-import net.gazeplay.utils.stats.ShootGamesStats;
 import net.gazeplay.utils.stats.Stats;
 
 /**
@@ -31,7 +30,7 @@ public class Target extends Portrait {
 
     private Stats stats;
 
-    public Target(Hand hand, ShootGamesStats stats) {
+    public Target(Hand hand, Stats stats) {
 
         super(radius);
 
@@ -48,7 +47,7 @@ public class Target extends Portrait {
                         && anniOff) {
 
                     anniOff = false;
-                    stats.incNbGoals();
+                    stats.onGoalReached();
                     enter();
                 }
             }
@@ -60,7 +59,7 @@ public class Target extends Portrait {
 
         this.addEventFilter(GazeEvent.ANY, enterEvent);
 
-        stats.start();
+        stats.onGoalAvailable();
     }
 
     private void enter() {
@@ -94,7 +93,7 @@ public class Target extends Portrait {
             public void handle(ActionEvent actionEvent) {
 
                 anniOff = true;
-                stats.start();
+                stats.onGoalAvailable();
             }
         });
     }

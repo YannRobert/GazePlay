@@ -26,7 +26,7 @@ public class MagicCards extends Application {
         Scene scene = new Scene(root, com.sun.glass.ui.Screen.getScreens().get(0).getWidth(),
                 com.sun.glass.ui.Screen.getScreens().get(0).getHeight(), Color.BLACK);
 
-        HiddenItemsGamesStats stats = new HiddenItemsGamesStats(scene);
+        HiddenItemsGamesStats stats = new HiddenItemsGamesStats("Magic Card");
 
         Card.addCards(root, scene, null, 2, 2, stats);
 

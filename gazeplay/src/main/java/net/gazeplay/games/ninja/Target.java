@@ -10,9 +10,8 @@ import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Screen;
-import net.gazeplay.utils.Portrait;
 import javafx.util.Duration;
-import net.gazeplay.utils.stats.ShootGamesStats;
+import net.gazeplay.utils.Portrait;
 import net.gazeplay.utils.stats.Stats;
 import utils.games.Utils;
 
@@ -37,7 +36,7 @@ public class Target extends Portrait {
 
     private ArrayList<Portrait> portraits = new ArrayList(nbBall);
 
-    public Target(Group root, ShootGamesStats shoottats) {
+    public Target(Group root, Stats shoottats) {
 
         super(radius);
 
@@ -60,7 +59,7 @@ public class Target extends Portrait {
 
         move();
 
-        stats.start();
+        stats.onGoalAvailable();
     }
 
     private EventHandler<Event> buildEvent() {
@@ -102,7 +101,7 @@ public class Target extends Portrait {
 
     private void enter() {
 
-        stats.incNbGoals();
+        stats.onGoalReached();
 
         // this.removeEventHandler(MouseEvent.MOUSE_ENTERED, enterEvent);
 
@@ -153,7 +152,7 @@ public class Target extends Portrait {
 
                 anniOff = true;
 
-                stats.start();
+                stats.onGoalAvailable();
             }
         });
 
