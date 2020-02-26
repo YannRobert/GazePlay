@@ -11,7 +11,7 @@ layout: single
 ## Snapshot versions
 
 <div class="iframe_container">
-<iframe src="https://gazeplay-dist.s3.eu-west-3.amazonaws.com/index.html" style="border:1; width: 60em; height: 20em"></iframe>
+<iframe src="https://gazeplay-dist.s3.eu-west-3.amazonaws.com/index.html" style="border:0; width: 60em; height: 20em"></iframe>
 </div>
 
 ## Advanced - Unpacking the .zip
